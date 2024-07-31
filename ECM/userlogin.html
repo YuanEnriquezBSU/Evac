@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign In</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="glass-container" id="login-container">
+            <div class="login-box">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <input type="text" id="loginEmail" name="email" required placeholder="Email">
+                    <input type="password" id="loginPassword" name="password" required placeholder="Password">
+                    <button type="submit">Login</button>
+                    <p id="OR">————— OR —————</p>
+                    <button type="button" class="google-login-button">
+                        <img src="googlelogo.png" alt="Google Logo" class="google-logo">
+                        Login with Google
+                    </button>
+                    <div class="options">
+                        <a href="#" class="hyperlink">Forgot Password?</a>
+                    </div>
+                    <p>Don't have an account? <a href="#" class="hyperlink" id="signup">Register</a></p>
+                </form>
+            </div>
+        </div>
+        <div class="glass-container" id="signup-container">
+            <div class="login-box">
+                <h2>Create Account</h2>
+                <form id="registerForm">
+                    <input type="text" id="signupName" name="signupName" required placeholder="Name">
+                    <input type="date" id="birthday" name="birthday" required placeholder="Birthday">
+                    <input type="text" id="signupEmail" name="email" required placeholder="Email" pattern="^[a-zA-Z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$" title="Please enter a valid email address ending with gmail.com, hotmail.com, or yahoo.com">
+
+                    <input type="password" id="signupPassword" name="password" required placeholder="Password">
+                    <input type="password" id="cpassword" name="cpassword" required placeholder="Confirm password">
+                    <button type="submit">Sign Up</button>
+                    <p>Already have an account? <a href="#" class="hyperlink" id="login">Sign In</a></p>
+                </form>
+            </div>
+        </div>
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Login successful');
+                        // Redirect or perform other actions
+                    } else {
+                        alert(`Login failed: ${result.error}`);
+                    }
+                } catch (error) {
+                    alert('An error occurred: ' + error.message);
+                }
+            });
+        
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value;
+                const date = document.getElementById('birthday').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const cpassword = document.getElementById('cpassword').value;
+                if (password !== cpassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                try {
+                    const response = await fetch('http://localhost:4000/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name, date, email, password })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Registration successful');
+                        // Redirect or perform other actions
+                    } else {
+                        alert(`Registration failed: ${result.error}`);
+                    }
+                } catch (error) {
+                    alert('An error occurred: ' + error.message);
+                }
+            });
+        
+            document.getElementById('signup').addEventListener('click', () => {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('signup-container').style.display = 'block';
+            });
+        
+            document.getElementById('login').addEventListener('click', () => {
+                document.getElementById('signup-container').style.display = 'none';
+                document.getElementById('login-container').style.display = 'block';
+            });
+        </script>
+    </body>
+</html>
