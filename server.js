@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('./auth'); // Adjust the path as necessary
 const sequelize = require('./config');
 const User = require('./models/User');
 
@@ -7,6 +9,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('ECM'));
+
+app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -55,8 +61,15 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Google OAuth routes
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
+  res.redirect('/dashboard'); // Redirect to a dashboard or home page after successful login
+});
+
 // Start the server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});
